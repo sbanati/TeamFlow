@@ -3,7 +3,7 @@ VALUES
 ('Engineering'),
 ('Sales'),
 ('Finance'),
-('Legal'),
+('Legal')
 
 
 
@@ -17,10 +17,10 @@ VALUES
 ('Account Manager', 140000.00, 3),
 ('Accountant', 110000.00, 3),
 ('Legal Team Lead', 150000.00, 4),
-('Lawyer', 120000.00, 4),
+('Lawyer', 120000.00, 4)
 
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
+INSERT INTO employees (first_name, last_name, roles_id, manager_id)
 VALUES
 ('Jay', 'Son', 1, NULL),
 ('Java', 'Script', 2, 1),
@@ -29,4 +29,4 @@ VALUES
 ('Elsa', 'Statements', 5, NULL),
 ('Django', 'Python', 6, 5),
 ('Asyn', 'Chronus', 7, NULL),
-('Rest', 'API', 8, 7),
+('Rest', 'API', 8, 7)
