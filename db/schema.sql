@@ -13,9 +13,7 @@ CREATE TABLE roles (
     title VARCHAR(300),
     salary DECIMAL(10, 2) -- Stores 10 digitgs with 2 digits to the right of the decimal point 
     department_id INT, -- References department by 
-    FOREIGN KEY (department_id) REFERENCES departments(deparment_id)
-    REFERENCES departments(id)
-    ON DELETE SET NULL
+    FOREIGN KEY (department_id) REFERENCES departments(department_id) ON DELETE SET NULL
 );
 
 CREATE TABLE employees (
@@ -24,8 +22,8 @@ CREATE TABLE employees (
     last_name VARCHAR(50) NOT NULL, 
     role_id INT,
     manager_id INT NOT NULL,
-    FOREIGN KEY (role_id) REFERENCES roles(roles_id),
-    FOREIGN KEY (manager_id) REFERENCES employees(employee_id)
+    FOREIGN KEY (role_id) REFERENCES roles(role_id),
+    FOREIGN KEY (manager_id) REFERENCES employees(employee_id) ON DELETE SET NULL
 );
 
 
