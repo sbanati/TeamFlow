@@ -65,7 +65,61 @@ function start() {
             ],
         })
         .then((answer) => {
-            
+            switch (answer.action) {
+                case "View All Departments":
+                    viewAllDepartments();
+                    break;
+                case 'View All Roles':
+                    viewAllRoles();
+                    break;
+                case "View All Employees":
+                    viewAllEmployees();
+                    break;
+                case 'Add A Department':
+                    addDepartment();
+                    break;
+                case 'Add A Role':
+                    addRole();
+                    break;
+                case 'Add An Employee':
+                    addEmployee();
+                    break;
+                case 'Update An Employee Role':
+                    updateEmployeeRole();
+                    break;
+                case 'View Employees By Manager':
+                    viewEmployeesByManager();
+                    break;
+                case 'View Employees By Department':
+                    viewEmployeesByDepartment();
+                    break;
+                case 'Update Employee Manager':
+                    updateEmployeeManager();
+                    break;
+                case 'Delete Departments | Roles | Employees':
+                    deleteDepartmentsRolesEmployees();
+                    break;
+                case 'Exit':
+                    Connection.end();
+                    console.log('See ya, bozo!');
+                    break;
+            }
+        });
+    };
 
-        })
+
+    // Function to View All Departments
+    function viewAllDepartments() {
+        //SQL query to select all records from the departments table
+        const query = 'SELECT * FROM departments';
+        //Use db.query method to execute the SQL query and call back will handle the error || response
+        db.query(query, (err, res) => {
+            if (err) throw err;
+            // Use console.table to display the table 
+            console.table(res);
+
+            // Return to the main menu after the display of the information
+            start();
+        });
+
     };
