@@ -200,3 +200,63 @@ function addDepartment() {
             });
         });
 }
+
+
+// function to Add A Role 
+function addRole() {
+
+    // Query to retrieve all the departments 
+    const query = 'SELECT * FROM departments';
+    
+    // Executing the query to get the actual departments
+    db.query(query, (err, res) => {
+        if (err) {
+            console.error('Error retrieving departments information:', err);
+        } else {
+            // Display table 
+            console.table(res);
+        }
+
+        // Prompt the user for information about the new role 
+        inquirer
+            .prompt([
+                {
+                    type: 'input',
+                    name: 'title',
+                    message: 'Enter the title of the new role',
+                },
+                {
+                    type: 'input',
+                    name: 'salary',
+                    message: 'Enter the salary of the new role',
+                },
+                {
+                    type: 'list',
+                    name: 'department',
+                    message: 'Choose the department for the new role',
+                    choices: res.map((department) => department.department_name),
+                },
+            ])
+            .then((answers) => {
+                // Find the department object based on the user's choice 
+                const department = res.find((dept) => dept.department_name === answers.department);
+                
+                // Insert the new role into the roles table 
+                const insertQuery = 'INSERT INTO roles SET ?';
+                db.query(insertQuery, {
+                    title: answers.title,
+                    salary: answers.salary,
+                    department_id: department.department_id,
+                    
+                }, (err, res) => {
+                    if (err) {
+                        console.error('Error adding new role:', err);
+                    } else {
+                        console.log(`Role ${answers.title} successfully added!`);
+                    }
+                    // Restart the application
+                    start();
+                });
+            });
+    });
+}
