@@ -2,6 +2,7 @@
 const inquirer = require('inquirer');
 const mysql2 = require('mysql2');
 const cfonts = require('cfonts');
+const cTable = require('console.table');
 
 
 // Establish a MYSQL connection
@@ -108,18 +109,68 @@ function start() {
     };
 
 
-    // Function to View All Departments
-    function viewAllDepartments() {
-        //SQL query to select all records from the departments table
-        const query = 'SELECT * FROM departments';
-        //Use db.query method to execute the SQL query and call back will handle the error || response
-        db.query(query, (err, res) => {
-            if (err) throw err;
-            // Use console.table to display the table 
+  // Function to View All Departments
+function viewAllDepartments() {
+    // SQL query to select all records from the departments table
+    const query = 'SELECT * FROM departments';
+
+    // Execute the query using the database connection
+    db.query(query, (err, res) => {
+        if (err) {
+            console.error("Error retrieving department information:", err);
+        } else {
+            // Display table
             console.table(res);
+        }
 
-            // Return to the main menu after the display of the information
+        // Return to the main menu after displaying the information
+        start();
+    });
+}
+
+
+   // Function to View All Roles
+function viewAllRoles() {
+    // SQL query to select specific columns from 'roles' and 'departments' tables
+    const query = 'SELECT roles_id, title, salary, roles.department_id, department_name FROM roles JOIN departments ON roles.department_id = departments.department_id';
+
+    // Execute the query using the database connection
+    db.query(query, (err, res) => {
+        if (err) {
+            console.error("Error retrieving role information:", err);
+        } else {
+            // Display table
+            console.table(res);
+        }
+
+        // Return to the main menu after displaying the information 
+        start();
+    });
+}
+
+    
+// Function to View All Employees 
+function viewAllEmployees() {
+        // SQL query to select specific columns from 'employee', 'roles', 'departments', and 'employee' tables
+        const query = `
+        SELECT e.employee_id, e.first_name, e.last_name, r.title, d.department_name, r.salary, CONCAT(m.first_name, '', m.last_name) AS manager_name
+        FROM employees e
+        LEFT JOIN roles r ON e.roles_id = r.roles_id
+        LEFT JOIN departments d ON r.department_id = d.department_id
+        LEFT JOIN employees m ON e.manager_id = m.employee_id;
+        `;
+
+        //Use db.query method to execute the SQL query and call back will handle the error || response 
+        db.query(query, (err, res) => {
+            if (err) {
+                console.error('Error retrieving employee information:', err);
+            } else {
+                // Display table
+                console.table(res);
+            }
+            
+            
+            // Return to the main menu after the display of the information 
             start();
-        });
-
-    };
+        })
+}
