@@ -247,7 +247,7 @@ function addRole() {
                     title: answers.title,
                     salary: answers.salary,
                     department_id: department.department_id,
-                    
+
                 }, (err, res) => {
                     if (err) {
                         console.error('Error adding new role:', err);
@@ -260,3 +260,176 @@ function addRole() {
             });
     });
 }
+
+
+
+
+// Function to Add An Employee
+function addEmployee() {
+    // Retrieve list of roles from the database
+    db.query('SELECT roles_id, title FROM roles', (err, res) => {
+        if (err) {
+            console.error('Error retrieving id and title from roles table', err);
+        } else {
+            // Display roles table
+            console.table(res);
+        }
+
+        // Map roles data for inquirer choices
+        const roles = res.map(({ roles_id, title }) => ({
+            name: title,
+            value: roles_id,
+        }));
+
+        // Retrieve list of managers from the database assuming managers are also employees
+        db.query('SELECT employee_id, CONCAT(first_name, " ", last_name) AS name FROM employees', (err, managersRes) => {
+            if (err) {
+                console.error('Error retrieving employees names from employees table', err);
+            } else {
+                // Display managers table
+                console.table(managersRes);
+
+                // Map managers data for inquirer choices
+                const managers = managersRes.map(({ employee_id, name }) => ({
+                    name,
+                    value: employee_id,
+                }));
+
+                // Prompt the user for information
+                inquirer.prompt([
+                    {
+                        type: 'input',
+                        name: 'firstName',
+                        message: 'Enter the employee\'s first name:',
+                    },
+                    {
+                        type: 'input',
+                        name: 'lastName',
+                        message: 'Enter the employee\'s last name:',
+                    },
+                    {
+                        type: 'list',
+                        name: 'roleId',
+                        message: 'Select the employee\'s role:',
+                        choices: roles,
+                    },
+                    {
+                        type: 'list',
+                        name: 'managerId',
+                        message: 'Select the employee\'s manager:',
+                        choices: [
+                            { name: 'None', value: null },
+                            ...managers,
+                        ],
+                    },
+                ]).then((answers) => {
+                    // Insert the employee into the database
+                    const insertQuery = 'INSERT INTO employees (first_name, last_name, roles_id, manager_id) VALUES (?, ?, ?, ?)';
+                    const values = [
+                        answers.firstName,
+                        answers.lastName,
+                        answers.roles_id,
+                        answers.manager_id,
+                    ];
+
+                    db.query(insertQuery, values, (err) => {
+                        if (err) {
+                            console.error('Failed to Insert The New Employee Into Database', err);
+                        } else {
+                            console.log('Employee was successfully added to the database');
+                        }
+
+                        // Restart the application
+                        start();
+                    });
+                });
+            }
+        });
+    });
+}
+
+
+
+
+
+// Function to update an employee role
+function updateEmployeeRole() {
+    // Query to fetch employee information with their current roles
+    const queryEmployees = "SELECT employees.employee_id, employees.first_name, employees.last_name, roles.title, roles.roles_id FROM employees LEFT JOIN roles ON employees.roles_id = roles.roles_id";
+
+    // Query to fetch all available roles
+    const queryRoles = "SELECT * FROM roles";
+
+    // Execute the query to fetch employees
+    db.query(queryEmployees, (err, resEmployees) => {
+        if (err) {
+            console.error('Error fetching employees:', err);
+            start();
+            return;
+        }
+
+        // Execute the query to fetch roles
+        db.query(queryRoles, (err, resRoles) => {
+            if (err) {
+                console.error('Error fetching roles:', err);
+                start();
+                return;
+            }
+
+            // Prompt user to select an employee and a new role
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "employee",
+                    message: "Select the employee to update:",
+                    choices: resEmployees.map(
+                        (employee) =>
+                            `${employee.first_name} ${employee.last_name}`
+                    ),
+                },
+                {
+                    type: "list",
+                    name: "role",
+                    message: "Select the new role:",
+                    choices: resRoles.map((role) => role.title),
+                },
+            ])
+            .then((answers) => {
+                // Find the selected employee and role
+                const employee = resEmployees.find(
+                    (employee) =>
+                        `${employee.first_name} ${employee.last_name}` ===
+                        answers.employee
+                );
+
+                const role = resRoles.find(
+                    (role) => role.title === answers.role
+                );
+
+                // Query to update the employee's role
+                const updateQuery = "UPDATE employees SET roles_id = ? WHERE employee_id = ?";
+                
+                // Execute the update query
+                db.query(
+                    updateQuery,
+                    [role.roles_id, employee.employee_id],
+                    (err, res) => {
+                        if (err) {
+                            console.error('Error updating employee role:', err);
+                        } else {
+                            // Display success message
+                            console.log(
+                                `Updated ${employee.first_name} ${employee.last_name}'s role to ${role.title} in the database!`
+                            );
+                        }
+
+                        // Restart the application
+                        start();
+                    }
+                );
+            });
+        });
+    });
+}
+
+
