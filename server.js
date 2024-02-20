@@ -11,7 +11,7 @@ const db = mysql2.createConnection(
         host:'localhost',
         user: 'root', // MYSQL username
         port: '3306', //Default MySQL port
-        password: 'silver11', // MYSQL password
+        password: 'silver11', // MYSQL password, dont worry this is not an important :)
         database: 'employeeTracker_db',
     },
     console.log(`Connected to the employeeTracker_db.`)
@@ -43,7 +43,7 @@ cfonts.say('FullStack Employee Manager ', {
 });
 
 
-// Function to Start Thomas SQL Employee Tracker Application
+// Function to Start Application
 function start() {
     inquirer
         .prompt({
@@ -58,11 +58,11 @@ function start() {
                 "Add A Role",
                 "Add An Employee",
                 "Update An Employee Role",
-                'View Employees By Manager',
-                'View Employees By Department',
                 'Update An Employees Manager',
-                'Delete Departments, roles, and employees',
-                "Quit",
+                'Delete a Department',
+                'Delete a Role',
+                'Delete an Employee',
+                "Exit",
             ],
         })
         .then((answer) => {
@@ -88,20 +88,20 @@ function start() {
                 case 'Update An Employee Role':
                     updateEmployeeRole();
                     break;
-                case 'View Employees By Manager':
-                    viewEmployeesByManager();
-                    break;
-                case 'View Employees By Department':
-                    viewEmployeesByDepartment();
-                    break;
                 case 'Update An Employees Manager':
                     updateEmployeeManager();
                     break;
-                case 'Delete Departments | Roles | Employees':
-                    deleteDepartmentsRolesEmployees();
+                case 'Delete a Department':
+                    deleteDepartment();
+                    break;
+                case 'Delete a Role':
+                    deleteRole();
+                    break;
+                case 'Delete an Employee':
+                    deleteEmployee();
                     break;
                 case 'Exit':
-                    Connection.end();
+                    db.end();
                     console.log('See ya, bozo!');
                     break;
             }
@@ -193,7 +193,7 @@ function addDepartment() {
                 if (err) {
                     console.error('Error creating department: ', err);
                 } else {
-                    console.log(`Added department ${answer.name} to the database`);
+                    console.log(`Added department ${answer.department_name} to the database`);
                 }
 
                 start();
@@ -260,7 +260,6 @@ function addRole() {
             });
     });
 }
-
 
 
 
@@ -347,7 +346,6 @@ function addEmployee() {
         });
     });
 }
-
 
 
 
@@ -443,7 +441,8 @@ function updateEmployeeManager() {
     db.query(queryDepartments, (err, resDepartments) => {
         if (err) {
             console.error("Error fetching departments:", err);
-            start(); // Restart the application
+            // Restart 
+            start();
             return;
         }
 
@@ -451,7 +450,8 @@ function updateEmployeeManager() {
         db.query(queryEmployees, (err, resEmployees) => {
             if (err) {
                 console.error("Error fetching employees:", err);
-                start(); // Restart the application
+                // Restart 
+                start();
                 return;
             }
 
@@ -507,7 +507,8 @@ function updateEmployeeManager() {
                     // Check if department, employee, and manager are valid selections
                     if (!department || !employee || !manager) {
                         console.error("Invalid department, employee, or manager selection.");
-                        start(); // Restart the application
+                        // Restart 
+                        start();
                         return;
                     }
 
@@ -526,6 +527,8 @@ function updateEmployeeManager() {
                         (err, res) => {
                             if (err) {
                                 console.error("Error updating manager:", err);
+                                // Handle error here
+                                // Display an error message or take appropriate action
                             } else {
                                 // Display success message
                                 console.log(
@@ -548,3 +551,184 @@ function updateEmployeeManager() {
     });
 }
 
+
+
+// Function to delete an Employee
+function deleteEmployee() {
+    // SQL query to select all employees
+    const query = "SELECT * FROM employees";
+
+    // Execute the query using the database connection
+    db.query(query, (err, res) => {
+        if (err) {
+            console.error("Error fetching employee information:", err);
+            start(); // Restart the application
+            return;
+        }
+
+        // Map employees for inquirer choices
+        const employeeList = res.map((employee) => ({
+            name: `${employee.first_name} ${employee.last_name}`,
+            value: employee.employee_id,
+        }));
+
+        // Add a "Go Back" option to the choices
+        employeeList.push({ name: "Go Back", value: "back" });
+
+        // Prompt user to select an employee for deletion
+        inquirer
+            .prompt({
+                type: "list",
+                name: "employeeId",
+                message: "Select the employee you want to delete:",
+                choices: employeeList,
+            })
+            .then((answer) => {
+                if (answer.employeeId === "back") {
+                    // Go back to the main menu 
+                    start();
+                    return;
+                }
+
+                // SQL query to delete the selected employee
+                const deleteQuery = "DELETE FROM employees WHERE employee_id = ?";
+
+                // Execute the delete query
+                db.query(deleteQuery, [answer.employeeId], (err) => {
+                    if (err) {
+                        console.error(`Error deleting employee with ID ${answer.employeeId}:`, err);
+                    } else {
+                        console.log(`Deleted employee with ID ${answer.employeeId} from the database!`);
+                    }
+
+                    // Restart the application
+                    start();
+                });
+            });
+    });
+}
+
+// Function to delete a Role
+function deleteRole() {
+    // Retrieve all available roles from the database
+    const query = "SELECT * FROM roles";
+    
+    // Execute the query to fetch roles
+    db.query(query, (err, res) => {
+        if (err) {
+            // Handle error fetching roles
+            console.error("Error fetching roles:", err);
+            
+            // Restart the application
+            start();
+            return;
+        }
+        // Call the map method on the retrieved roles from the response to create an array of choices
+        const roleChoices = res.map((role) => ({
+            name: `${role.title} (${role.roles_id}) - ${role.salary}`,
+            value: role.roles_id,
+        }));
+
+        // Add a "Go Back" option to the list of choices
+        roleChoices.push({ name: "Go Back", value: null });
+
+        // Prompt user to select a role for deletion
+        inquirer
+            .prompt({
+                type: "list",
+                name: "roleId",
+                message: "Select the role you want to delete:",
+                choices: roleChoices,
+            })
+            .then((answer) => {
+                // Check if the user chose the "Go Back" option
+                if (answer.roleId === null) {
+                    // Go back to the main menu 
+                    start();
+                    return;
+                }
+
+                // SQL query to delete the selected role
+                const deleteQuery = "DELETE FROM roles WHERE roles_id = ?";
+                
+                // Execute the delete query
+                db.query(deleteQuery, [answer.roleId], (err, res) => {
+                    if (err) {
+                        // Handle error deleting role
+                        console.error(`Error deleting role with ID ${answer.roleId}:`, err);
+                    } else {
+                        // Display success message
+                        console.log(`Deleted role with ID ${answer.roleId} from the database!`);
+                    }
+
+                    // Restart the application
+                    start();
+                });
+            });
+    });
+}
+
+// Function to delete a Department
+function deleteDepartment() {
+    // SQL query to retrieve the list of departments from the database
+    const query = "SELECT * FROM departments";
+
+    // Execute the query to fetch departments
+    db.query(query, (err, res) => {
+        // Check for errors while fetching departments
+        if (err) {
+            console.error("Error fetching departments:", err);
+
+            // Restart the application
+            start();
+            return;
+        }
+
+        // Map through the retrieved departments to create an array of choices
+        const departmentChoices = res.map((department) => ({
+            name: department.department_name,
+            value: department.department_id,
+        }));
+
+        // Prompt the user to select a department for deletion
+        inquirer
+            .prompt({
+                type: "list",
+                name: "departmentId",
+                message: "Which department do you want to delete?",
+                choices: [
+                    ...departmentChoices,
+                    { name: "Go Back", value: "back" },
+                ],
+            })
+            .then((answer) => {
+                if (answer.departmentId === "back") {
+                    // Go back to the main menu
+                    start();
+                } else {
+                    // SQL query to delete the selected department
+                    const deleteQuery = "DELETE FROM departments WHERE department_id = ?";
+
+                    // Execute the delete query
+                    db.query(
+                        deleteQuery,
+                        [answer.departmentId],
+                        (err, res) => {
+                            // Check for errors while deleting the department
+                            if (err) {
+                                console.error(`Error deleting department with ID ${answer.departmentId}:`, err);
+                            } else {
+                                // Display success message
+                                console.log(
+                                    `Deleted department with ID ${answer.departmentId} from the database!`
+                                );
+                            }
+
+                            // Restart the application
+                            start();
+                        }
+                    );
+                }
+            });
+    });
+}
