@@ -574,7 +574,7 @@ function deleteEmployee() {
         // Add a "Go Back" option to the choices
         employeeList.push({ name: "Go Back", value: "back" });
 
-        // Prompt user to select an employee for deletion
+        // Prompt user to select an employee to delete
         inquirer
             .prompt({
                 type: "list",
