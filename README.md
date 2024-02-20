@@ -70,7 +70,7 @@ This project is a node.js challenge where I was tasked with building a command-l
 
 * [![Static Badge](https://img.shields.io/badge/Java-gray?style=for-the-badge&logo=JavaScript&logoColor=yellow)](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)
 * ![Static Badge](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
-* [![npm](https://badge.fury.io/js/inquirer.svg)](http://badge.fury.io/js/inquirer)
+* [![npm](https://badge.fury.io/js/inquirer.svg)](http://badge.fury.io/js/inquirer@8.2.4)
 
   
 
