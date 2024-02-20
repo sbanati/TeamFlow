@@ -308,13 +308,13 @@ function addEmployee() {
                     },
                     {
                         type: 'list',
-                        name: 'roleId',
+                        name: 'roles_id',
                         message: 'Select the employee\'s role:',
                         choices: roles,
                     },
                     {
                         type: 'list',
-                        name: 'managerId',
+                        name: 'manager_id',
                         message: 'Select the employee\'s manager:',
                         choices: [
                             { name: 'None', value: null },
@@ -552,7 +552,6 @@ function updateEmployeeManager() {
 }
 
 
-
 // Function to delete an Employee
 function deleteEmployee() {
     // SQL query to select all employees
@@ -732,3 +731,9 @@ function deleteDepartment() {
             });
     });
 }
+
+
+// Closes the connection when the app is closed 
+process.on("exit", () => {
+    db.end();
+});
