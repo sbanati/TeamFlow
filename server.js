@@ -60,7 +60,7 @@ function start() {
                 "Update An Employee Role",
                 'View Employees By Manager',
                 'View Employees By Department',
-                'Update Employee Managers',
+                'Update An Employees Manager',
                 'Delete Departments, roles, and employees',
                 "Quit",
             ],
@@ -94,7 +94,7 @@ function start() {
                 case 'View Employees By Department':
                     viewEmployeesByDepartment();
                     break;
-                case 'Update Employee Manager':
+                case 'Update An Employees Manager':
                     updateEmployeeManager();
                     break;
                 case 'Delete Departments | Roles | Employees':
@@ -351,7 +351,6 @@ function addEmployee() {
 
 
 
-
 // Function to update an employee role
 function updateEmployeeRole() {
     // Query to fetch employee information with their current roles
@@ -432,4 +431,120 @@ function updateEmployeeRole() {
     });
 }
 
+// Function to update Employee Managers
+function updateEmployeeManager() {
+    // Query to fetch all departments
+    const queryDepartments = "SELECT * FROM departments";
+
+    // Query to fetch all employees
+    const queryEmployees = "SELECT * FROM employees";
+
+    // Fetch all departments from the database
+    db.query(queryDepartments, (err, resDepartments) => {
+        if (err) {
+            console.error("Error fetching departments:", err);
+            start(); // Restart the application
+            return;
+        }
+
+        // Fetch all employees from the database
+        db.query(queryEmployees, (err, resEmployees) => {
+            if (err) {
+                console.error("Error fetching employees:", err);
+                start(); // Restart the application
+                return;
+            }
+
+            // Prompt user to select department, employee, and manager
+            inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        name: "department",
+                        message: "Select the department:",
+                        choices: resDepartments.map(
+                            (department) => department.department_name
+                        ),
+                    },
+                    {
+                        type: "list",
+                        name: "employee",
+                        message: "Select the employee to add a manager to:",
+                        choices: resEmployees.map(
+                            (employee) =>
+                                `${employee.first_name} ${employee.last_name}`
+                        ),
+                    },
+                    {
+                        type: "list",
+                        name: "manager",
+                        message: "Select the employee's manager:",
+                        choices: resEmployees.map(
+                            (employee) =>
+                                `${employee.first_name} ${employee.last_name}`
+                        ),
+                    },
+                ])
+                .then((answers) => {
+                    // Find the selected department, employee, and manager
+                    const department = resDepartments.find(
+                        (department) =>
+                            department.department_name === answers.department
+                    );
+
+                    const employee = resEmployees.find(
+                        (employee) =>
+                            `${employee.first_name} ${employee.last_name}` ===
+                            answers.employee
+                    );
+
+                    const manager = resEmployees.find(
+                        (employee) =>
+                            `${employee.first_name} ${employee.last_name}` ===
+                            answers.manager
+                    );
+
+                    // Check if department, employee, and manager are valid selections
+                    if (!department || !employee || !manager) {
+                        console.error("Invalid department, employee, or manager selection.");
+                        start(); // Restart the application
+                        return;
+                    }
+
+                    // Query to update the employee's manager in the database
+                    const updateQuery =
+                        "UPDATE employees SET manager_id = ? WHERE employee_id = ? AND roles_id IN (SELECT roles_id FROM roles WHERE department_id = ?)";
+
+                    // Check if the selected manager is the same as the employee being updated
+                    const managerId =
+                        manager.employee_id === employee.employee_id ? null : manager.employee_id;
+
+                    // Execute the update query
+                    db.query(
+                        updateQuery,
+                        [managerId, employee.employee_id, department.department_id],
+                        (err, res) => {
+                            if (err) {
+                                console.error("Error updating manager:", err);
+                            } else {
+                                // Display success message
+                                console.log(
+                                    `Added manager ${
+                                        managerId
+                                            ? `${manager.first_name} ${manager.last_name}`
+                                            : 'null'
+                                    } to employee ${employee.first_name} ${employee.last_name} in department ${
+                                        department.department_name
+                                    }!`
+                                );
+                            }
+
+                            // Restart the application
+                            start();
+                        }
+                    );
+                });
+        });
+    });
+}
 
