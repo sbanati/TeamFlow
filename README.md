@@ -109,7 +109,7 @@ For anyone wanting to contribute <br>
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-<h3>Video of the README Wizard.</h3>
+<h3>Demo Video of TeamFlow Wizard.</h3>
 
 https://youtu.be/BvpyViD6ejs
 
