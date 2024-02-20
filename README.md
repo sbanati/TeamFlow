@@ -68,7 +68,7 @@ This project is a node.js challenge where I was tasked with building a command-l
 
 ### Built With
 
-* [![Static Badge](https://img.shields.io/badge/Java-gray?style=for-the-badge&logo=JavaScript&logoColor=yellow)](https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E)
+* ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 * ![Static Badge](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
 * [![npm](https://badge.fury.io/js/inquirer.svg)](https://www.npmjs.com/package/inquirer/v/8.2.4)
 * ![MySQL2](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
