@@ -89,7 +89,7 @@ This project is a node.js challenge where I was tasked with building a command-l
 ## Getting Started
 
  <h3>For end users</h3> 
-https://github.com/sbanati/employee-tracker  <br>
+https://github.com/sbanati/TeamFlow  <br>
 
 
 
@@ -99,7 +99,7 @@ For anyone wanting to contribute <br>
 
 1. Clone the repo
    ```sh
-   https://github.com/sbanati/employee-tracker.git
+   https://github.com/sbanati/TeamFlow.git
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
