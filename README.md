@@ -129,8 +129,9 @@ https://youtu.be/Ft5N33LkwrQ
 
 <h3>Possible features</h3>
 
-* Adding icons for the tech stack display
-* Adding a screenshot section 
+* The delete functions are stand alone,  implimenting a main function for deletion of department/role/employee and that function would call one of the individual functions when the user answers a prompt handled by switch case.
+* Refactor the code for asynch JS
+* Modularizing the server.js file for separation of concerns of functions 
 
 
 
